@@ -637,3 +637,8 @@ void helper_wrpkru(CPUX86State *env, uint32_t ecx, uint64_t val)
     env->pkru = val;
     tlb_flush(cs);
 }
+
+void helper_memaddr(CPUX86State *env) {
+    if (env->eip < (unsigned long long)0x4000000000)
+        fprintf(stderr,"0x%llx\n", (unsigned long long)env->eip);
+}
