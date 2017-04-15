@@ -639,6 +639,9 @@ void helper_wrpkru(CPUX86State *env, uint32_t ecx, uint64_t val)
 }
 
 void helper_memaddr(CPUX86State *env) {
-    if (env->eip < (unsigned long long)0x4000000000)
-        fprintf(stderr,"0x%llx\n", (unsigned long long)env->eip);
+    static unsigned long long addr = 0;
+    if (env->eip < (unsigned long long)0x4000000000) {
+        addr = (unsigned long long)env->eip;
+        fprintf(stderr,"%llx\n", addr);
+    }
 }

@@ -7926,7 +7926,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
                 envc++;
             }
 
-            argp = alloca((argc + 1) * sizeof(void *));
+            argp = alloca((argc + 2) * sizeof(void *));
             envp = alloca((envc + 1) * sizeof(void *));
 
             for (gp = guest_argp, q = argp; gp;
@@ -7965,7 +7965,24 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
              * before the execve completes and makes it the other
              * program's problem.
              */
-            ret = get_errno(safe_execve(p, argp, envp));
+            int index = 0;
+            char tmp_s[] = "/home/chihmin/qemu-sim/build/bin/qemu-x86_64";
+
+            // fprintf(stderr, "---------------\n"); 
+
+            for (index = argc; index > 0; --index) {
+                argp[index] = argp[index - 1];
+            }
+
+            argp[argc+1] = NULL;
+            argp[0] = tmp_s;
+            /*
+            fprintf(stderr, "\n");
+            for (index = 0; index <= argc; ++index)
+                fprintf(stderr, "%s ", argp[index]);
+            */
+            ret = get_errno(safe_execve(tmp_s, argp, envp));
+            // fprintf(stderr, "error code = %ld\n", (long)ret);
             unlock_user(p, arg1, 0);
 
             goto execve_end;

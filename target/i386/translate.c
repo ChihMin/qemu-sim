@@ -4404,7 +4404,7 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
     target_ulong next_eip, tval;
     int rex_w, rex_r;
     
-    gen_helper_memaddr(cpu_env);
+    // gen_helper_memaddr(cpu_env);
 
     s->pc_start = s->pc = pc_start;
     prefixes = 0;
@@ -8428,6 +8428,7 @@ void gen_intermediate_code(CPUX86State *env, TranslationBlock *tb)
     }
 
     gen_tb_start(tb);
+    gen_helper_memaddr(cpu_env);
     for(;;) {
         tcg_gen_insn_start(pc_ptr, dc->cc_op);
         num_insns++;
