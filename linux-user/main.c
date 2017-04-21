@@ -4014,6 +4014,13 @@ static void handle_arg_trace(const char *arg)
     trace_file = trace_opt_parse(arg);
 }
 
+extern FILE *f_edgedumper;
+char *dump_file_name;
+static void handle_arg_dump(const char *arg) {
+    dump_file_name = (char *)malloc(strlen(arg)+10);
+    strcpy(dump_file_name, arg);
+}
+
 struct qemu_argument {
     const char *argv;
     const char *env;
@@ -4024,6 +4031,8 @@ struct qemu_argument {
 };
 
 static const struct qemu_argument arg_table[] = {
+    {"dump",       "QEMU_DUMP_MEMADDR", true, handle_arg_dump,
+     "",           "Specify memory dump addr"},
     {"h",          "",                 false, handle_arg_help,
      "",           "print this help"},
     {"help",       "",                 false, handle_arg_help,
@@ -4208,7 +4217,7 @@ static int parse_args(int argc, char **argv)
 
     return optind;
 }
-
+char *qemu_exec_name;
 int main(int argc, char **argv, char **envp)
 {
     struct target_pt_regs regs1, *regs = &regs1;
@@ -4228,6 +4237,9 @@ int main(int argc, char **argv, char **envp)
     module_call_init(MODULE_INIT_TRACE);
     qemu_init_cpu_list();
     module_call_init(MODULE_INIT_QOM);
+    
+    qemu_exec_name = (char *)malloc(strlen(argv[0]) + 5);
+    strcpy(qemu_exec_name, argv[0]);
 
     if ((envlist = envlist_create()) == NULL) {
         (void) fprintf(stderr, "Unable to allocate envlist\n");
@@ -4857,7 +4869,13 @@ int main(int argc, char **argv, char **envp)
         }
         gdb_handlesig(cpu, 0);
     }
-    cpu_loop(env);
+    if (dump_file_name == NULL) {
+        fprintf(stderr, "Please use -dump specify memory dump file name ...\n");
+        return -1;
+    } else {
+        f_edgedumper = fopen(dump_file_name, "a");
+        cpu_loop(env);
+    }
     /* never exits */
     return 0;
 }

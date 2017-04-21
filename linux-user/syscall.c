@@ -7652,7 +7652,8 @@ static int do_openat(void *cpu_env, int dirfd, const char *pathname, int flags, 
 
 #define TIMER_MAGIC 0x0caf0000
 #define TIMER_MAGIC_MASK 0xffff0000
-
+extern char *dump_file_name;
+extern char *qemu_exec_name;
 /* Convert QEMU provided timer ID back to internal 16bit index format */
 static target_timer_t get_timer_id(abi_long arg)
 {
@@ -7926,7 +7927,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
                 envc++;
             }
 
-            argp = alloca((argc + 2) * sizeof(void *));
+            argp = alloca((argc + 5) * sizeof(void *));
             envp = alloca((envc + 1) * sizeof(void *));
 
             for (gp = guest_argp, q = argp; gp;
@@ -7967,20 +7968,23 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
              */
             int index = 0;
             char tmp_s[] = "/home/chihmin/qemu-sim/build/bin/qemu-x86_64";
-
+            char dump_arg[] = "-dump";
             // fprintf(stderr, "---------------\n"); 
 
-            for (index = argc; index > 0; --index) {
-                argp[index] = argp[index - 1];
+            for (index = argc + 2; index > 2; --index) {
+                argp[index] = argp[index - 3];
             }
 
-            argp[argc+1] = NULL;
-            argp[0] = tmp_s;
-            /*
-            fprintf(stderr, "\n");
-            for (index = 0; index <= argc; ++index)
+            argp[argc+3] = NULL;
+            argp[0] = qemu_exec_name;
+            argp[1] = dump_arg;
+            argp[2] = dump_file_name;
+            
+            fprintf(stderr, "\n~~~~~~");
+            for (index = 0; index <= argc + 2; ++index)
                 fprintf(stderr, "%s ", argp[index]);
-            */
+            fprintf(stderr, "~~~~~\n");
+            
             ret = get_errno(safe_execve(tmp_s, argp, envp));
             // fprintf(stderr, "error code = %ld\n", (long)ret);
             unlock_user(p, arg1, 0);
