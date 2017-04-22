@@ -7967,9 +7967,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
              * program's problem.
              */
             int index = 0;
-            char tmp_s[] = "/home/chihmin/qemu-sim/build/bin/qemu-x86_64";
             char dump_arg[] = "-dump";
-            // fprintf(stderr, "---------------\n"); 
 
             for (index = argc + 2; index > 2; --index) {
                 argp[index] = argp[index - 3];
@@ -7980,13 +7978,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
             argp[1] = dump_arg;
             argp[2] = dump_file_name;
             
-            fprintf(stderr, "\n~~~~~~");
-            for (index = 0; index <= argc + 2; ++index)
-                fprintf(stderr, "%s ", argp[index]);
-            fprintf(stderr, "~~~~~\n");
-            
-            ret = get_errno(safe_execve(tmp_s, argp, envp));
-            // fprintf(stderr, "error code = %ld\n", (long)ret);
+            ret = get_errno(safe_execve(qemu_exec_name, argp, envp));
             unlock_user(p, arg1, 0);
 
             goto execve_end;
