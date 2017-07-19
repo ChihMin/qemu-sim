@@ -648,6 +648,6 @@ void helper_memaddr(CPUX86State *env) {
 
 FILE *f_edgedumper;
 void helper_edgedumper(CPUX86State *env, uint64_t caller_addr, uint64_t callee_addr) {
-    fprintf(f_edgedumper, "%llx,%llx\n", (unsigned long long)caller_addr, (unsigned long long)callee_addr);
-    //fflush(f_edgedumper);
+    if (env->eip < 0x4000000000)
+        fprintf(f_edgedumper, "%llx,%llx\n", (unsigned long long)env->eip, (unsigned long long)callee_addr);
 }

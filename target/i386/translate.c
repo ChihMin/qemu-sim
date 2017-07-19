@@ -4965,8 +4965,7 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
             }
             next_eip = s->pc - s->cs_base;
             
-            if (env->eip < 0x4000000000)
-                gen_helper_edgedumper(cpu_env, tcg_const_i64(env->eip), cpu_T0);
+            gen_helper_edgedumper(cpu_env, tcg_const_i64(env->eip), cpu_T0);
 
             tcg_gen_movi_tl(cpu_T1, next_eip);
             gen_push_v(s, cpu_T1);
@@ -6461,9 +6460,9 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
             next_eip = s->pc - s->cs_base;
             tval += next_eip;
             
-            if (env->eip < 0x4000000000) {
+            //if (env->eip < 0x4000000000) {
                 gen_helper_edgedumper(cpu_env, tcg_const_i64(env->eip), tcg_const_i64(tval));
-            }
+            //}
 
             if (dflag == MO_16) {
                 tval &= 0xffff;
